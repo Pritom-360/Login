@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .profile-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <h2>User Profile</h2>
+        <p><strong>Registration Number:</strong> <span id="regNumber"></span></p>
+        <p><strong>Name:</strong> <span id="name"></span></p>
+        <p><strong>Email:</strong> <span id="email"></span></p>
+        <p><strong>Phone:</strong> <span id="phone"></span></p>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (userData) {
+                document.getElementById('regNumber').innerText = userData.registrationNumber || 'N/A';
+                document.getElementById('name').innerText = userData.name || 'N/A';
+                document.getElementById('email').innerText = userData.email || 'N/A';
+                document.getElementById('phone').innerText = userData.phoneNumber || 'N/A';
+            } else {
+                document.querySelector('.profile-container').innerHTML = '<p>No user data available. Please <a href="login.html">login</a> again.</p>';
+            }
+        });
+    </script>
+    
+    <button onclick="logout()">Logout</button>
+
+<script>
+    function logout() {
+        localStorage.clear(); // Clear all stored data
+        window.location.href = 'login.html'; // Redirect to login page
+    }
+</script>
+
+</body>
+</html>
