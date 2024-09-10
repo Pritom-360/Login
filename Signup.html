@@ -146,10 +146,10 @@
         .then(responseText => {
             if (responseText === "Success") {
                 alert("Registration successful!");
-                window.location.href = "https://sites.google.com/view/catalyst-360/signup-and-login/signup?authuser=0"; // Redirect to success page
+                window.location.href = "https://sites.google.com/view/catalyst-360/signup-and-login/signup"; // Redirect to success page
             } else {
                 alert(responseText);
-                window.location.href = "https://sites.google.com/view/catalyst-360/signup-and-login/login?authuser=0"; // Redirect back to the form
+                window.location.href = "https://sites.google.com/view/catalyst-360/signup-and-login/login"; // Redirect back to the form
             }
         })
         .catch(error => {
