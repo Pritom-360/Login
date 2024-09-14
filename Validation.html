@@ -105,7 +105,7 @@
       const email = document.getElementById('email').value;
       const validationCode = document.getElementById('validationCode').value;
 
-      const response = await fetch('https://script.google.com/macros/s/AKfycbxYBpOCQQQ2Lbt0tIpDrHVxbWjn59doRg9DVIcAw4-8qAK_Mva9BJO07XcQah1h2O0WsA/exec', {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbw2_8P7F474K9D53Biz-FD3vMgo4raCGSASaQdhY9HpE1-dA1zAa7jjfNJomHE-tBkYlg/exec', {
         method: 'POST',
         body: JSON.stringify({ email, validationCode })
       });
