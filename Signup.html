@@ -4,183 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .signup-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        h2 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background: #fafafa;
-        }
-        input[type="file"] {
-            padding: 6px;
-        }
-        label {
-            font-size: 14px;
-            color: #666;
-        }
-        .required {
-            color: red;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 12px;
-        }
-        button:hover {
-            background-color: #43a047;
-        }
-
-        .error-message {
-            color: red;
-            font-size: 12px;
-            display: none;
-        }
-
-        /* Media query for smaller devices (phones) */
-        @media only screen and (max-width: 768px) {
-            .signup-container {
-                width: 90%;
-                margin: 10px;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="signup-container">
+    <div>
         <h2>Sign Up</h2>
-        <form id="signupForm" action="https://script.google.com/macros/s/AKfycby1TETi6-CkpJZ7B03ps092KFoBHJCU5-Kpsgp0lY9bmIOe8UU3i9PK8WSvNQ9hqaHz/exec" method="post" enctype="application/x-www-form-urlencoded">
+        <form id="signupForm">
+            <label for="fullname">Full Name:</label>
+            <input type="text" id="fullname" required>
 
-            <label for="photo">Upload Photo (Optional)</label>
-            <input type="file" id="photo" name="photo">
-            
-            <label for="name">Full Name <span class="required">*</span></label>
-            <input type="text" id="name" name="name" placeholder="Your full name" required>
-            
-            <label for="email">Email <span class="required">*</span></label>
-            <input type="email" id="email" name="email" placeholder="Your email" required>
-            
-            <label for="phone">Phone Number <span class="required">*</span></label>
-            <input type="text" id="phone" name="phone" placeholder="Your phone number" required>
-            
-            <label for="address">Address (Optional)</label>
-            <input type="text" id="address" name="address" placeholder="Your address">
-            
-            <label for="age">Age <span class="required">*</span></label>
-            <input type="number" id="age" name="age" placeholder="Your age" required>
-            
-            <label for="education">Your Highest Education <span class="required">*</span></label>
-            <input type="text" id="education" name="education" placeholder="Your highest education" required>
-            
-            <label for="institution">Institution's Name <span class="required">*</span></label>
-            <input type="text" id="institution" name="institution" placeholder="Institution's name" required>
-            
-            <label for="facebook">Facebook Profile Link <span class="required">*</span></label>
-            <input type="url" id="facebook" name="facebook" placeholder="Facebook profile link" required>
-            
-            <label for="skills">Your Skills (Optional)</label>
-            <textarea id="skills" name="skills" placeholder="e.g., Video Editing, Graphic Designing"></textarea>
-            
-            <label for="talent">Your Talent (Optional)</label>
-            <textarea id="talent" name="talent" placeholder="e.g., Guitarist, Singer"></textarea>
-            
-            <label for="password">Create Password <span class="required">*</span></label>
-            <input type="password" id="password" name="password" placeholder="Create password" required>
-            
-            <label for="re_password">Re-enter Password <span class="required">*</span></label>
-            <input type="password" id="re_password" name="re_password" placeholder="Re-enter password" required>
-            
-            <span class="error-message" id="error-message">Password do not matching my catalystian....</span>
-            
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+
             <button type="submit">Sign Up</button>
         </form>
     </div>
 
     <script>
-    
-    
-     document.getElementById("signupForm").onsubmit = function(event) {
-        event.preventDefault(); // Prevent default form submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fullname = document.getElementById('fullname').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
 
-        const formData = new FormData(this);
+            const response = await fetch('https://script.google.com/macros/s/AKfycbynNHf_52pfXV7B_ZGwA5bgKlAIfGRKp9WLfLbmn9zZjxopn-NTbDgceFUWMMF4mJOuIg/exec', {
+                method: 'POST',
+                body: JSON.stringify({ fullname, email, phone, password }),
+                headers: { 'Content-Type': 'application/json' }
+            });
 
-        fetch(this.action, {
-            method: this.method,
-            body: new URLSearchParams(formData),
-        })
-        .then(response => response.text())
-        .then(responseText => {
-            if (responseText === "Success") {
-                alert("Registration successful!");
-                window.location.href = "https://i.imgur.com/2Kwv58E.png"; // Redirect to success page
-            } else {
-                alert(responseText);
-                window.location.href = "hhttps://i.imgur.com/iTl3gki.png"; // Redirect back to the form
-            }
-        })
-        .catch(error => {
-            alert("An error occurred. Please try again.");
-            console.error("Error:", error);
-        });
-    };
-    
-    
-        const signupForm = document.getElementById('signupForm');
-        const password = document.getElementById('password');
-        const rePassword = document.getElementById('re_password');
-        const errorMessage = document.getElementById('error-message');
-
-        // Realtime password validation
-        rePassword.addEventListener('input', function() {
-            if (password.value !== rePassword.value) {
-                errorMessage.style.display = 'block'; // Show error message if passwords don't match
-            } else {
-                errorMessage.style.display = 'none'; // Hide error message if passwords match
-            }
-        });
-
-        // Final validation before form submission
-        signupForm.addEventListener('submit', function(event) {
-            if (password.value !== rePassword.value) {
-                event.preventDefault(); // Prevent form submission if passwords don't match
-                errorMessage.style.display = 'block'; // Show error message
+            const result = await response.json();
+            alert(result.message);
+            if (result.success) {
+                window.location.href = 'validation.html';  // Redirect to validation page
             }
         });
     </script>
 </body>
 </html>
-
