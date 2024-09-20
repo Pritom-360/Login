@@ -1,76 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Validation</title>
-  <script>
-    let timer = 120; // 2-minute countdown for the code expiration
-    let interval;
-
-    function startTimer() {
-      interval = setInterval(function () {
-        timer--;
-        document.getElementById("timer").innerText = `You can request a new code in ${timer} seconds.`;
-        if (timer <= 0) {
-          clearInterval(interval);
-          document.getElementById("resend-btn").disabled = false;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validate Your Account</title>
+    <style>
+        /* Add some styles for better UI */
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(90deg, #FFC371 0%, #FF5F6D 100%);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-      }, 1000);
-    }
-
-    async function validateCode() {
-      const email = new URLSearchParams(window.location.search).get('email');
-      const code = document.getElementById('validationCode').value;
-
-      const gasUrl = 'https://script.google.com/macros/s/AKfycbyzncOArwSGp-Mmom_28fgKQ7TeUzEz2l_bQbVde-y5YCr8NoV7ItZHFBdvVVAMGr4lBw/exec'; // Replace with your GAS deploy URL
-
-      const response = await fetch(gasUrl, {
-        method: 'POST',
-        body: new URLSearchParams({
-          action: 'validate',
-          email: email,
-          code: code
-        })
-      });
-
-      const result = await response.json();
-      alert(result.message);
-    }
-
-    async function resendCode() {
-      const email = new URLSearchParams(window.location.search).get('email');
-
-      const gasUrl = 'https://script.google.com/macros/s/AKfycbyzncOArwSGp-Mmom_28fgKQ7TeUzEz2l_bQbVde-y5YCr8NoV7ItZHFBdvVVAMGr4lBw/exec'; // Replace with your GAS deploy URL
-
-      const response = await fetch(gasUrl, {
-        method: 'POST',
-        body: new URLSearchParams({
-          action: 'resend',
-          email: email
-        })
-      });
-
-      const result = await response.json();
-      alert(result.message);
-
-      if (result.success) {
-        timer = 120;
-        document.getElementById("resend-btn").disabled = true;
-        startTimer(); // Restart the countdown
-      }
-    }
-
-    window.onload = startTimer;
-  </script>
+        .validation-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .validation-form h2 {
+            text-align: center;
+            color: #FF5F6D;
+        }
+        .validation-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .validation-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #FF5F6D;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Validation Page</h1>
-  <label for="validationCode">Enter Validation Code:</label>
-  <input type="text" id="validationCode" required>
-  <button onclick="validateCode()">Submit</button>
 
-  <p id="timer">You can request a new code in 120 seconds.</p>
-  <button id="resend-btn" onclick="resendCode()" disabled>Resend Code</button>
+<div class="validation-form">
+    <h2>Enter Your Validation Code</h2>
+    <form id="validationForm">
+        <label for="code">Validation Code:</label>
+        <input type="text" id="code" required>
+
+        <button type="submit" id="validateButton">Validate</button>
+        <p class="error" id="errorMessage"></p>
+
+        <button id="resendButton" type="button">Resend Code</button>
+        <p id="resendMessage"></p>
+    </form>
+</div>
+
+<script>
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const email = urlParams.get('email');
+
+document.getElementById('validationForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var validateButton = document.getElementById('validateButton');
+    validateButton.disabled = true;
+
+    var code = document.getElementById('code').value;
+
+    var formData = new FormData();
+    formData.append('action', 'validate');
+    formData.append('email', email);
+    formData.append('code', code);
+
+    fetch('https://script.google.com/macros/s/AKfycbwEfWdI-FIHL9Mz7ZgInzOeYkqDsADVkKZV8vQFpAoxaQ2atorh7dz7PeJw-1ZwkbSD/exec', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.result === 'success') {
+            window.location.href = data.redirect;
+        } else {
+            document.getElementById('errorMessage').textContent = data.message;
+            validateButton.disabled = false;
+        }
+    })
+    .catch(error => {
+        document.getElementById('errorMessage').textContent = 'Something went wrong. Please try again.';
+        validateButton.disabled = false;
+    });
+});
+
+document.getElementById('resendButton').addEventListener('click', function () {
+    var resendButton = document.getElementById('resendButton');
+    resendButton.disabled = true;
+
+    var formData = new FormData();
+    formData.append('action', 'resend');
+    formData.append('email', email);
+
+    fetch('https://script.google.com/macros/s/AKfycbwEfWdI-FIHL9Mz7ZgInzOeYkqDsADVkKZV8vQFpAoxaQ2atorh7dz7PeJw-1ZwkbSD/exec', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('resendMessage').textContent = data.message;
+        resendButton.disabled = false;
+    })
+    .catch(error => {
+        document.getElementById('resendMessage').textContent = 'Something went wrong. Please try again.';
+        resendButton.disabled = false;
+    });
+});
+</script>
+
 </body>
 </html>
