@@ -1,56 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Validation</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation</title>
+  <script>
+    let timer = 120; // 2-minute countdown for the code expiration
+    let interval;
+
+    function startTimer() {
+      interval = setInterval(function () {
+        timer--;
+        document.getElementById("timer").innerText = `You can request a new code in ${timer} seconds.`;
+        if (timer <= 0) {
+          clearInterval(interval);
+          document.getElementById("resend-btn").disabled = false;
+        }
+      }, 1000);
+    }
+
+    async function validateCode() {
+      const email = new URLSearchParams(window.location.search).get('email');
+      const code = document.getElementById('validationCode').value;
+
+      const gasUrl = 'https://script.google.com/macros/s/AKfycbyzncOArwSGp-Mmom_28fgKQ7TeUzEz2l_bQbVde-y5YCr8NoV7ItZHFBdvVVAMGr4lBw/exec'; // Replace with your GAS deploy URL
+
+      const response = await fetch(gasUrl, {
+        method: 'POST',
+        body: new URLSearchParams({
+          action: 'validate',
+          email: email,
+          code: code
+        })
+      });
+
+      const result = await response.json();
+      alert(result.message);
+    }
+
+    async function resendCode() {
+      const email = new URLSearchParams(window.location.search).get('email');
+
+      const gasUrl = 'https://script.google.com/macros/s/AKfycbyzncOArwSGp-Mmom_28fgKQ7TeUzEz2l_bQbVde-y5YCr8NoV7ItZHFBdvVVAMGr4lBw/exec'; // Replace with your GAS deploy URL
+
+      const response = await fetch(gasUrl, {
+        method: 'POST',
+        body: new URLSearchParams({
+          action: 'resend',
+          email: email
+        })
+      });
+
+      const result = await response.json();
+      alert(result.message);
+
+      if (result.success) {
+        timer = 120;
+        document.getElementById("resend-btn").disabled = true;
+        startTimer(); // Restart the countdown
+      }
+    }
+
+    window.onload = startTimer;
+  </script>
 </head>
 <body>
-    <div>
-        <h2>Validation</h2>
-        <form id="validationForm">
-            <label for="email">Email:</label>
-            <input type="email" id="email" required>
+  <h1>Validation Page</h1>
+  <label for="validationCode">Enter Validation Code:</label>
+  <input type="text" id="validationCode" required>
+  <button onclick="validateCode()">Submit</button>
 
-            <label for="validationCode">Validation Code:</label>
-            <input type="text" id="validationCode" required>
-
-            <button type="submit">Validate</button>
-        </form>
-
-        <p id="timer"></p>
-    </div>
-
-    <script>
-        let countdown;
-
-        document.getElementById('validationForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const validationCode = document.getElementById('validationCode').value;
-
-            const response = await fetch('https://script.google.com/macros/s/AKfycbynNHf_52pfXV7B_ZGwA5bgKlAIfGRKp9WLfLbmn9zZjxopn-NTbDgceFUWMMF4mJOuIg/exec', {
-                method: 'POST',
-                body: JSON.stringify({ email, validationCode }),
-                headers: { 'Content-Type': 'application/json' }
-            });
-
-            const result = await response.json();
-            alert(result.message);
-        });
-
-        function startTimer() {
-            let time = 120;
-            countdown = setInterval(() => {
-                if (time <= 0) {
-                    clearInterval(countdown);
-                    document.getElementById('timer').innerText = '';
-                } else {
-                    document.getElementById('timer').innerText = `You can resend the code in ${time} seconds.`;
-                    time--;
-                }
-            }, 1000);
-        }
-    </script>
+  <p id="timer">You can request a new code in 120 seconds.</p>
+  <button id="resend-btn" onclick="resendCode()" disabled>Resend Code</button>
 </body>
 </html>
