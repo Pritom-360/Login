@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up Form</title>
+    <title>Email Validation</title>
     <style>
-        /* General Styles */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f4f7f6;
+            background-color: #f0f4f7;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -16,56 +15,34 @@
             margin: 0;
         }
 
-        .signup-container {
+        .validation-container {
             background-color: #ffffff;
             border-radius: 10px;
-            padding: 40px;
+            padding: 30px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             max-width: 400px;
             width: 100%;
+            text-align: center;
         }
 
         h2 {
-            text-align: center;
+            color: #4CAF50;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        p {
             color: #333;
             margin-bottom: 20px;
-            font-size: 24px;
         }
 
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        label {
-            margin-bottom: 5px;
-            color: #555;
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        input[type="password"],
-        select {
+        input[type="text"] {
+            width: 100%;
             padding: 10px;
-            margin-bottom: 20px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            margin-bottom: 20px;
             font-size: 14px;
-            width: 100%;
-        }
-
-        .phone-group {
-            display: flex;
-        }
-
-        .phone-group select {
-            width: 35%;
-            margin-right: 10px;
-        }
-
-        .phone-group input {
-            width: 65%;
         }
 
         button {
@@ -86,13 +63,10 @@
         .error {
             color: red;
             font-size: 12px;
-            margin-top: -15px;
             margin-bottom: 15px;
-            display: block;
         }
 
-        .footer-message {
-            text-align: center;
+        .resend-message {
             font-size: 12px;
             color: #777;
             margin-top: 20px;
@@ -100,42 +74,17 @@
     </style>
 </head>
 <body>
-    <div class="signup-container">
-        <h2>Create Your Account</h2>
-        <form id="signupForm">
-            <label for="fullname">Full Name:</label>
-            <input type="text" id="fullname" placeholder="Enter your full name" required>
-            <span id="nameError" class="error"></span>
+    <div class="validation-container">
+        <h2>Email Verification</h2>
+        <p>Please enter the verification code sent to your email.</p>
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" placeholder="Enter your email" required>
-            <span id="emailError" class="error"></span>
+        <input type="text" id="validationCode" placeholder="Enter your validation code" required>
+        <span id="errorMessage" class="error"></span>
 
-            <label for="phone">Phone Number:</label>
-            <div class="phone-group">
-                <select id="countryCode" required>
-                    <option value="+1">+1 (USA)</option>
-                    <option value="+44">+44 (UK)</option>
-                    <option value="+61">+61 (Australia)</option>
-                    <option value="+91">+91 (India)</option>
-                    <option value="+880">+880 (Bangladesh)</option>
-                </select>
-                <input type="tel" id="phone" placeholder="Enter phone number" required pattern="[0-9]{10}">
-            </div>
-            <span id="phoneError" class="error"></span>
+        <button type="submit" onclick="submitValidation()">Validate</button>
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" placeholder="Enter your password" required minlength="6">
-            <span id="passwordError" class="error"></span>
-
-            <label for="confirmPassword">Re-enter Password:</label>
-            <input type="password" id="confirmPassword" placeholder="Re-enter your password" required>
-            <span id="matchError" class="error"></span>
-
-            <button type="submit" id="submitBtn" disabled>Sign Up</button>
-        </form>
-        <div class="footer-message">
-            By signing up, you agree to our Terms & Privacy Policy.
+        <div class="resend-message">
+            You can resend the code in <span id="timer">120</span> seconds.
         </div>
     </div>
 
