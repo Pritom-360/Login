@@ -1,123 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Validation</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f4f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation</title>
+  <style>   
 
-        .validation-container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
+    /* Your CSS styles here */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5; /* Light gray background */
+    }
 
-        h2 {
-            color: #4CAF50;
-            font-size: 22px;
-            margin-bottom: 10px;
-        }
+    .container {
+      max-width: 400px; /* Set a fixed width */
+      margin: 0 auto; /* Center the container horizontally */
+      padding: 20px;
+    }
 
-        p {
-            color: #333;
-            margin-bottom: 20px;
-        }
+    h1 {
+      text-align: center;
+      color: #333; /* Darker text for heading */
+    }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
 
-        button {
-            padding: 12px;
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
 
-        button:hover {
-            background-color: #45a049;
-        }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;   
 
-        .error {
-            color: red;
-            font-size: 12px;
-            margin-bottom: 15px;
-        }
+      cursor: pointer;
+    }
 
-        .resend-message {
-            font-size: 12px;
-            color: #777;
-            margin-top: 20px;
+    .submit-btn { /* Style submit button */
+      background-color: #007bff; /* Blue */
+      color: white;
+    }
+
+    .resend-btn { /* Style resend button */
+      background-color: #ddd; /* Light gray */
+      color: #999; /* Gray text */
+      cursor: not-allowed; /* Indicate disabled state */
+    }
+
+    #timer {
+      font-weight: bold; /* Make timer text stand out */
+      color: #f00; /* Red for urgency */
+    }
+  </style>
+  <script>
+    let timer = 120; // 2-minute countdown for the code expiration
+    let interval;
+
+    function startTimer() {
+      interval = setInterval(function () {
+        timer--;
+        document.getElementById("timer").innerText = `You can request a new code in ${timer} seconds.`;
+        if (timer <= 0) {
+          clearInterval(interval);
+          document.getElementById("resend-btn").disabled = false;
         }
-    </style>
+      }, 1000);
+    }
+
+    async function validateCode() {
+      const email = new URLSearchParams(window.location.search).get('email');
+      const code = document.getElementById('validationCode').value;
+
+      const gasUrl = 'https://script.google.com/macros/s/AKfycbzG7XEUL4lETy_IsrBhuro9IrIqEgnHSwuDcXn1O6ry88S_Arn_UXmYivk5f-05hfmc0g/exec'; // Replace with your GAS deploy URL
+
+      const response = await fetch(gasUrl, {
+        method: 'POST',
+        body: new URLSearchParams({
+          action: 'validate',
+          email: email,
+          code: code
+        })
+      });
+
+      const result = await response.json();
+      alert(result.message);
+    }
+
+    async function resendCode() {
+      const email = new URLSearchParams(window.location.search).get('email');
+
+      const gasUrl = 'https://script.google.com/macros/s/AKfycbzG7XEUL4lETy_IsrBhuro9IrIqEgnHSwuDcXn1O6ry88S_Arn_UXmYivk5f-05hfmc0g/exec'; // Replace with your GAS deploy URL
+
+      const response = await fetch(gasUrl, {
+        method: 'POST',
+        body: new URLSearchParams({
+          action: 'resend',
+          email: email
+        })
+      });
+
+      const result = await response.json();
+      alert(result.message);
+
+      if (result.success) {
+        timer = 120;
+        document.getElementById("resend-btn").disabled = true;
+        startTimer(); // Restart the countdown
+      }
+    }
+
+    window.onload = startTimer;
+  </script>
 </head>
 <body>
-    <div class="validation-container">
-        <h2>Email Verification</h2>
-        <p>Please enter the verification code sent to your email.</p>
+  <h1>Validation Page</h1>
+  <div class="container">
+    <label for="validationCode">Enter Validation Code:</label>
+    <input type="text" id="validationCode" required>
+    <button class="submit-btn" onclick="validateCode()">Submit</button>
 
-        <input type="text" id="validationCode" placeholder="Enter your validation code" required>
-        <span id="errorMessage" class="error"></span>
-
-        <button type="submit" onclick="submitValidation()">Validate</button>
-
-        <div class="resend-message">
-            You can resend the code in <span id="timer">120</span> seconds.
-        </div>
-    </div>
-
-<script>
-// Replace 'YOUR_DEPLOY_URL' with your actual Google Apps Script Deploy URL
-const GAS_VALIDATION_URL = 'https://script.google.com/macros/s/AKfycbzG7XEUL4lETy_IsrBhuro9IrIqEgnHSwuDcXn1O6ry88S_Arn_UXmYivk5f-05hfmc0g/exec';
-
-function submitValidation() {
-    const email = new URLSearchParams(window.location.search).get('email');
-    const validationCode = document.getElementById('validationCode').value;
-
-    const data = {
-        email: email,
-        validationCode: validationCode
-    };
-
-    fetch(GAS_VALIDATION_URL, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(response => response.json())
-      .then(result => {
-          if (result.status === 'success') {
-              alert('Validation successful!');
-              // Do something like redirecting to the next page
-          } else {
-              document.getElementById('errorMessage').innerText = result.message;
-          }
-      }).catch(error => console.error('Error:', error));
-}
-</script>
-
+    <p id="timer">You can request a new code in 120 seconds.</p>
+    <button class="resend-btn" id="resend-btn" onclick="resendCode()" disabled>Resend Code</button>
+  </div>
 </body>
 </html>
