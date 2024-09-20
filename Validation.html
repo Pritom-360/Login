@@ -1,76 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Validation</title>
-  <script>
-    let timer = 120; // 2-minute countdown for the code expiration
-    let interval;
-
-    function startTimer() {
-      interval = setInterval(function () {
-        timer--;
-        document.getElementById("timer").innerText = `You can request a new code in ${timer} seconds.`;
-        if (timer <= 0) {
-          clearInterval(interval);
-          document.getElementById("resend-btn").disabled = false;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up Form</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-      }, 1000);
-    }
 
-    async function validateCode() {
-      const email = new URLSearchParams(window.location.search).get('email');
-      const code = document.getElementById('validationCode').value;
+        .signup-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
 
-      const gasUrl = 'https://script.google.com/macros/s/AKfycbx8jam3qEO1DQx4MyhhHGJvcZA5F7rc1OCniueR8aydcYq4BWIphxpMf-CE1-7MOPkIjQ/exec'; // Replace with your GAS deploy URL
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
 
-      const response = await fetch(gasUrl, {
-        method: 'POST',
-        body: new URLSearchParams({
-          action: 'validate',
-          email: email,
-          code: code
-        })
-      });
+        form {
+            display: flex;
+            flex-direction: column;
+        }
 
-      const result = await response.json();
-      alert(result.message);
-    }
+        label {
+            margin-bottom: 5px;
+            color: #555;
+        }
 
-    async function resendCode() {
-      const email = new URLSearchParams(window.location.search).get('email');
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="password"],
+        select {
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+        }
 
-      const gasUrl = 'https://script.google.com/macros/s/AKfycbx8jam3qEO1DQx4MyhhHGJvcZA5F7rc1OCniueR8aydcYq4BWIphxpMf-CE1-7MOPkIjQ/exec'; // Replace with your GAS deploy URL
+        .phone-group {
+            display: flex;
+        }
 
-      const response = await fetch(gasUrl, {
-        method: 'POST',
-        body: new URLSearchParams({
-          action: 'resend',
-          email: email
-        })
-      });
+        .phone-group select {
+            width: 35%;
+            margin-right: 10px;
+        }
 
-      const result = await response.json();
-      alert(result.message);
+        .phone-group input {
+            width: 65%;
+        }
 
-      if (result.success) {
-        timer = 120;
-        document.getElementById("resend-btn").disabled = true;
-        startTimer(); // Restart the countdown
-      }
-    }
+        button {
+            padding: 12px;
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-    window.onload = startTimer;
-  </script>
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+            margin-top: -15px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .footer-message {
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Validation Page</h1>
-  <label for="validationCode">Enter Validation Code:</label>
-  <input type="text" id="validationCode" required>
-  <button onclick="validateCode()">Submit</button>
+    <div class="signup-container">
+        <h2>Create Your Account</h2>
+        <form id="signupForm">
+            <label for="fullname">Full Name:</label>
+            <input type="text" id="fullname" placeholder="Enter your full name" required>
+            <span id="nameError" class="error"></span>
 
-  <p id="timer">You can request a new code in 120 seconds.</p>
-  <button id="resend-btn" onclick="resendCode()" disabled>Resend Code</button>
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Enter your email" required>
+            <span id="emailError" class="error"></span>
+
+            <label for="phone">Phone Number:</label>
+            <div class="phone-group">
+                <select id="countryCode" required>
+                    <option value="+1">+1 (USA)</option>
+                    <option value="+44">+44 (UK)</option>
+                    <option value="+61">+61 (Australia)</option>
+                    <option value="+91">+91 (India)</option>
+                    <option value="+880">+880 (Bangladesh)</option>
+                </select>
+                <input type="tel" id="phone" placeholder="Enter phone number" required pattern="[0-9]{10}">
+            </div>
+            <span id="phoneError" class="error"></span>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Enter your password" required minlength="6">
+            <span id="passwordError" class="error"></span>
+
+            <label for="confirmPassword">Re-enter Password:</label>
+            <input type="password" id="confirmPassword" placeholder="Re-enter your password" required>
+            <span id="matchError" class="error"></span>
+
+            <button type="submit" id="submitBtn" disabled>Sign Up</button>
+        </form>
+        <div class="footer-message">
+            By signing up, you agree to our Terms & Privacy Policy.
+        </div>
+    </div>
+
+<script>
+// Replace 'YOUR_DEPLOY_URL' with your actual Google Apps Script Deploy URL
+const GAS_VALIDATION_URL = 'https://script.google.com/macros/s/AKfycbzG7XEUL4lETy_IsrBhuro9IrIqEgnHSwuDcXn1O6ry88S_Arn_UXmYivk5f-05hfmc0g/exec';
+
+function submitValidation() {
+    const email = new URLSearchParams(window.location.search).get('email');
+    const validationCode = document.getElementById('validationCode').value;
+
+    const data = {
+        email: email,
+        validationCode: validationCode
+    };
+
+    fetch(GAS_VALIDATION_URL, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json())
+      .then(result => {
+          if (result.status === 'success') {
+              alert('Validation successful!');
+              // Do something like redirecting to the next page
+          } else {
+              document.getElementById('errorMessage').innerText = result.message;
+          }
+      }).catch(error => console.error('Error:', error));
+}
+</script>
+
 </body>
 </html>
