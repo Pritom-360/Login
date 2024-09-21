@@ -78,7 +78,7 @@
       const email = new URLSearchParams(window.location.search).get('email');
       const code = document.getElementById('validationCode').value;
 
-      const gasUrl = 'https://script.google.com/macros/s/AKfycbzG7XEUL4lETy_IsrBhuro9IrIqEgnHSwuDcXn1O6ry88S_Arn_UXmYivk5f-05hfmc0g/exec'; // Replace with your GAS deploy URL
+      const gasUrl = 'https://script.google.com/macros/s/AKfycbyTP6VqsJzE43atvImjZY955CZ0BzwsddkYuvanXS5R4hNR829Ly29qLWdE7buqIjse8w/exec'; // Replace with your GAS deploy URL
 
       const response = await fetch(gasUrl, {
         method: 'POST',
@@ -96,7 +96,7 @@
     async function resendCode() {
       const email = new URLSearchParams(window.location.search).get('email');
 
-      const gasUrl = 'https://script.google.com/macros/s/AKfycbzG7XEUL4lETy_IsrBhuro9IrIqEgnHSwuDcXn1O6ry88S_Arn_UXmYivk5f-05hfmc0g/exec'; // Replace with your GAS deploy URL
+      const gasUrl = 'https://script.google.com/macros/s/AKfycbyTP6VqsJzE43atvImjZY955CZ0BzwsddkYuvanXS5R4hNR829Ly29qLWdE7buqIjse8w/exec'; // Replace with your GAS deploy URL
 
       const response = await fetch(gasUrl, {
         method: 'POST',
