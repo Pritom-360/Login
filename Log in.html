@@ -16,11 +16,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: flex;
         }
         .login-container {
-            width: 100%;
-            max-width: 400px;
+            width: flex;
+            max-width: flex;
             padding: 20px;
             background-color: white;
             border-radius: 12px;
@@ -47,7 +47,7 @@
         button {
             width: 100%;
             padding: 12px;
-            background-color: #4CAF50;
+            background-color: #2F2F2F;
             color: white;
             border: none;
             border-radius: 6px;
@@ -55,7 +55,7 @@
             margin-top: 12px;
         }
         button:hover {
-            background-color: #43a047;
+            background-color: #000000;
         }
     </style>
 </head>
@@ -79,39 +79,38 @@
 
     <script>
       document.getElementById('loginForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const emailOrPhone = document.getElementById('email_phone').value;
-    const regNumber = document.getElementById('registration_number').value;
-    const password = document.getElementById('password').value;
+          e.preventDefault();
+          const emailOrPhone = document.getElementById('email_phone').value;
+          const regNumber = document.getElementById('registration_number').value;
+          const password = document.getElementById('password').value;
 
-    // Send login data to Apps Script
-    fetch('https://script.google.com/macros/s/AKfycbzOZPQGBiLH3LyBIMP6flKOYwKEOZFc_fmiEZrIaiHqTjAW0kkDmVvqH078gxvIfjta/exec', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            email_phone: emailOrPhone,
-            registration_number: regNumber,
-            password: password
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Redirect to profile page with user data
-            localStorage.setItem('userData', JSON.stringify(data.userData));
-            window.location.href = 'https://pritom-360.github.io/Login/Profile';
-        } else {
-            document.getElementById('errorMessage').innerText = data.message;
-            document.getElementById('errorMessage').style.display = 'block';
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
-
+          // Send login data to Apps Script
+          fetch('https://script.google.com/macros/s/AKfycbyv7fTWlU4JUOIXR-UPi9A14yN_JZWHBe8bhoglmaNSTQM1p8L2dPD-MiKiNFWI6w8/exec', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                  email_phone: emailOrPhone,
+                  registration_number: regNumber,
+                  password: password
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  // Redirect to profile page with user data
+                  localStorage.setItem('userData', JSON.stringify(data.userData));
+                  window.location.href = 'https://pritom-360.github.io/Login/Profile';
+              } else {
+                  document.getElementById('errorMessage').innerText = data.message;
+                  document.getElementById('errorMessage').style.display = 'block';
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+      });
     </script>
 </body>
 </html>
