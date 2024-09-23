@@ -11,11 +11,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: flex;
         }
         .profile-container {
-            width: 100%;
-            max-width: 600px;
+            width: flex;
+            max-width: flex;
             padding: 20px;
             background-color: white;
             border-radius: 12px;
@@ -32,39 +32,173 @@
             color: #666;
             margin-bottom: 10px;
         }
+        .profile-picture {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .profile-picture img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+        }
+        .section-title {
+            font-size: 20px;
+            margin: 20px 0;
+            color: #333;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        button:hover {
+            background-color: #43a047;
+        }
     </style>
 </head>
 <body>
     <div class="profile-container">
-        <h2>User Profile</h2>
+        <h2>Catalystian Profile</h2>
+        
+        <div class="profile-picture">
+            <img id="profilePic" alt="Profile Picture">
+        </div>
+
+        <!-- Personal Info Section -->
         <p><strong>Registration Number:</strong> <span id="regNumber"></span></p>
-        <p><strong>Name:</strong> <span id="name"></span></p>
+        <p><strong>Full Name:</strong> <span id="fullName"></span></p>
         <p><strong>Email:</strong> <span id="email"></span></p>
-        <p><strong>Phone:</strong> <span id="phone"></span></p>
+        <p><strong>Phone Number:</strong> <span id="phoneNumber"></span></p>
+        <p><strong>Address:</strong> <span id="address"></span></p>
+        <p><strong>Age:</strong> <span id="age"></span></p>
+        <p><strong>Highest Education:</strong> <span id="highestEducation"></span></p>
+        <p><strong>Institution Name:</strong> <span id="institutionName"></span></p>
+        <p><strong>Facebook Profile Link:</strong> <a id="facebookProfileLink" href="" target="_blank"></a></p>
+        <p><strong>Skills:</strong> <span id="skills"></span></p>
+        <p><strong>Talent:</strong> <span id="talent"></span></p>
+
+        <!-- Courses Section -->
+        <div class="section-title">Courses</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Course Name</th>
+                    <th>Course Link</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="courseTable">
+            </tbody>
+        </table>
+
+        <!-- Orders Section -->
+        <div class="section-title">Orders</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody id="orderTable">
+            </tbody>
+        </table>
+
+        <button onclick="logout()">Logout</button>
     </div>
 
     <script>
         window.addEventListener('load', function() {
             const userData = JSON.parse(localStorage.getItem('userData'));
             if (userData) {
+                // Populate personal information
                 document.getElementById('regNumber').innerText = userData.registrationNumber || 'N/A';
-                document.getElementById('name').innerText = userData.name || 'N/A';
+                document.getElementById('fullName').innerText = userData.fullName || 'N/A';
                 document.getElementById('email').innerText = userData.email || 'N/A';
-                document.getElementById('phone').innerText = userData.phoneNumber || 'N/A';
+                document.getElementById('phoneNumber').innerText = userData.phoneNumber || 'N/A';
+                document.getElementById('address').innerText = userData.address || 'N/A';
+                document.getElementById('age').innerText = userData.age || 'N/A';
+                document.getElementById('highestEducation').innerText = userData.highestEducation || 'N/A';
+                document.getElementById('institutionName').innerText = userData.institutionName || 'N/A';
+
+                // Set Facebook profile link
+                const fbLink = userData.facebookProfileLink || '#';
+                document.getElementById('facebookProfileLink').innerText = fbLink;
+                document.getElementById('facebookProfileLink').href = fbLink;
+
+                // Display Skills and Talent
+                document.getElementById('skills').innerText = userData.skills || 'N/A';
+                document.getElementById('talent').innerText = userData.talent || 'N/A';
+
+                // Set profile picture
+                if (userData.profilePicture) {
+                    document.getElementById('profilePic').src = userData.profilePicture;
+                } else {
+                    document.getElementById('profilePic').src = 'default-profile.png'; // Default image if none is provided
+                }
+
+                // Populate Courses
+                const courseTable = document.getElementById('courseTable');
+                if (userData.courses && userData.courses.length) {
+                    userData.courses.forEach(course => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${course.name || 'N/A'}</td>
+                            <td><a href="${course.link}" target="_blank">Go to Course</a></td>
+                            <td>${course.status || 'N/A'}</td>
+                        `;
+                        courseTable.appendChild(row);
+                    });
+                }
+
+                // Populate Orders
+                const orderTable = document.getElementById('orderTable');
+                if (userData.orders && userData.orders.length) {
+                    userData.orders.forEach(order => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${order.orderId || 'N/A'}</td>
+                            <td>${order.product || 'N/A'}</td>
+                            <td>${order.price || 'N/A'}</td>
+                            <td>${order.date || 'N/A'}</td>
+                        `;
+                        orderTable.appendChild(row);
+                    });
+                }
             } else {
-                document.querySelector('.profile-container').innerHTML = '<p>No user data available. Please <a href="https://pritom-360.github.io/Login/Log%20in">login</a> again.</p>';
+                document.querySelector('.profile-container').innerHTML = '<p>No user data available. Please <a href="login.html">login</a> again.</p>';
             }
         });
+
+        function logout() {
+            localStorage.removeItem('userData');
+            window.location.href = 'login.html';
+        }
     </script>
-    
-    <button onclick="logout()">Logout</button>
-
-<script>
-    function logout() {
-        localStorage.clear(); // Clear all stored data
-        window.location.href = 'https://pritom-360.github.io/Login/Log%20in'; // Redirect to login page
-    }
-</script>
-
 </body>
 </html>
