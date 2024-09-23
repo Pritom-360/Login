@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <style>
+        /* Existing CSS */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f4;
@@ -77,12 +78,18 @@
         button:hover {
             background-color: #000000;
         }
+        /* New CSS for Achievement Section */
+        .achievement-section img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
     <div class="profile-container">
         <h2>Catalystian Profile</h2>
-        
+
         <div class="profile-picture">
             <img id="profilePic" alt="Profile Picture">
         </div>
@@ -99,6 +106,20 @@
         <p><strong>Facebook Profile Link:</strong> <a id="facebookProfileLink" href="" target="_blank"></a></p>
         <p><strong>Skills:</strong> <span id="skills"></span></p>
         <p><strong>Talent:</strong> <span id="talent"></span></p>
+
+        <!-- Achievement Section -->
+        <div class="section-title">Achievements</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Achievement</th>
+                    <th>Batch</th>
+                    <th>Certificate</th>
+                </tr>
+            </thead>
+            <tbody id="achievementTable">
+            </tbody>
+        </table>
 
         <!-- Courses Section -->
         <div class="section-title">Courses</div>
@@ -160,6 +181,20 @@
                     document.getElementById('profilePic').src = userData.profilePicture;
                 } else {
                     document.getElementById('profilePic').src = 'default-profile.png'; // Default image if none is provided
+                }
+
+                // Populate Achievements
+                const achievementTable = document.getElementById('achievementTable');
+                if (userData.achievements && userData.achievements.length) {
+                    userData.achievements.forEach(achievement => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${achievement.name || 'N/A'}</td>
+                            <td><img src="${achievement.batch}" alt="Batch Image"></td>
+                            <td><a href="${achievement.certificate}" target="_blank">View Certificate</a></td>
+                        `;
+                        achievementTable.appendChild(row);
+                    });
                 }
 
                 // Populate Courses
