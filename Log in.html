@@ -101,7 +101,7 @@
               if (data.success) {
                   // Redirect to profile page with user data
                   localStorage.setItem('userData', JSON.stringify(data.userData));
-                  window.location.href = 'https://pritom-360.github.io/Login/Profile';
+                  window.location.href = 'https://pritom-360.github.io/Login/Profile.html';
               } else {
                   document.getElementById('errorMessage').innerText = data.message;
                   document.getElementById('errorMessage').style.display = 'block';
