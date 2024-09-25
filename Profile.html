@@ -232,9 +232,17 @@
                         listItem.innerHTML = `<a href="${item.trim()}" target="_blank">${item.trim()}</a>`;
                         portfolioLinks.appendChild(listItem);
                     });
+
+               
                 } else {
                     portfolioLinks.innerHTML = '<li>N/A</li>';
                 }
+            }
+        });
+
+                        }
+            } else {
+                document.querySelector('.profile-container').innerHTML = '<p>No user data available. Please <a href="https://pritom-360.github.io/Login/Log%20in">login</a> again.</p>';
             }
         });
 
