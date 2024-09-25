@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
     <style>
-        /* Existing CSS */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f4;
@@ -150,6 +149,16 @@
             </tbody>
         </table>
 
+        <!-- Job Section -->
+        <p><strong>Job:</strong> <span id="job"></span></p>
+
+        <!-- CV Section -->
+        <p><strong>CV:</strong> <a id="cvLink" href="" target="_blank">Download CV</a></p>
+
+        <!-- Portfolio Section -->
+        <p><strong>Portfolio:</strong></p>
+        <ul id="portfolioLinks"></ul>
+
         <button onclick="logout()">Logout</button>
     </div>
 
@@ -166,73 +175,73 @@
                 document.getElementById('age').innerText = userData.age || 'N/A';
                 document.getElementById('highestEducation').innerText = userData.highestEducation || 'N/A';
                 document.getElementById('institutionName').innerText = userData.institutionName || 'N/A';
-
-                // Set Facebook profile link
-                const fbLink = userData.facebookProfileLink || '#';
-                document.getElementById('facebookProfileLink').innerText = fbLink;
-                document.getElementById('facebookProfileLink').href = fbLink;
-
-                // Display Skills and Talent
+                document.getElementById('facebookProfileLink').innerText = userData.facebookProfileLink || 'N/A';
+                document.getElementById('facebookProfileLink').href = userData.facebookProfileLink || '#';
                 document.getElementById('skills').innerText = userData.skills || 'N/A';
                 document.getElementById('talent').innerText = userData.talent || 'N/A';
 
-                // Set profile picture
-                if (userData.profilePicture) {
-                    document.getElementById('profilePic').src = userData.profilePicture;
-                } else {
-                    document.getElementById('profilePic').src = 'default-profile.png'; // Default image if none is provided
-                }
+                // Populate Profile Picture
+                document.getElementById('profilePic').src = userData.profilePicture || 'default-avatar.png';
 
                 // Populate Achievements
                 const achievementTable = document.getElementById('achievementTable');
-                if (userData.achievements && userData.achievements.length) {
-                    userData.achievements.forEach(achievement => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${achievement.name || 'N/A'}</td>
-                            <td><img src="${achievement.batch}" alt="Batch Image"></td>
-                            <td><a href="${achievement.certificate}" target="_blank">View Certificate</a></td>
-                        `;
-                        achievementTable.appendChild(row);
-                    });
-                }
+                userData.achievements.forEach(item => {
+                    const row = `<tr>
+                        <td>${item.achievement}</td>
+                        <td><img src="${item.batch}" alt="Batch"></td>
+                        <td><a href="${item.certificate}" target="_blank">View Certificate</a></td>
+                    </tr>`;
+                    achievementTable.innerHTML += row;
+                });
 
                 // Populate Courses
                 const courseTable = document.getElementById('courseTable');
-                if (userData.courses && userData.courses.length) {
-                    userData.courses.forEach(course => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${course.name || 'N/A'}</td>
-                            <td><a href="${course.link}" target="_blank">Go to Course</a></td>
-                            <td>${course.status || 'N/A'}</td>
-                        `;
-                        courseTable.appendChild(row);
-                    });
-                }
+                userData.courses.forEach(course => {
+                    const row = `<tr>
+                        <td>${course.name}</td>
+                        <td><a href="${course.link}" target="_blank">View Course</a></td>
+                        <td>${course.status}</td>
+                    </tr>`;
+                    courseTable.innerHTML += row;
+                });
 
                 // Populate Orders
                 const orderTable = document.getElementById('orderTable');
-                if (userData.orders && userData.orders.length) {
-                    userData.orders.forEach(order => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${order.orderId || 'N/A'}</td>
-                            <td>${order.product || 'N/A'}</td>
-                            <td>${order.price || 'N/A'}</td>
-                            <td>${order.date || 'N/A'}</td>
-                        `;
-                        orderTable.appendChild(row);
+                userData.orders.forEach(order => {
+                    const row = `<tr>
+                        <td>${order.orderId}</td>
+                        <td>${order.product}</td>
+                        <td>${order.price}</td>
+                        <td>${order.date}</td>
+                    </tr>`;
+                    orderTable.innerHTML += row;
+                });
+
+                // Populate Job
+                document.getElementById('job').innerText = userData.job || 'N/A';
+
+                // Populate CV
+                const cvLink = userData.cvLink || '#';
+                document.getElementById('cvLink').href = cvLink;
+
+                // Populate Portfolio
+                const portfolioLinks = document.getElementById('portfolioLinks');
+                if (userData.portfolio) {
+                    const portfolioItems = userData.portfolio.split(';'); // Assuming portfolio links are stored as semicolon-separated values
+                    portfolioItems.forEach(item => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<a href="${item.trim()}" target="_blank">${item.trim()}</a>`;
+                        portfolioLinks.appendChild(listItem);
                     });
+                } else {
+                    portfolioLinks.innerHTML = '<li>N/A</li>';
                 }
-            } else {
-                document.querySelector('.profile-container').innerHTML = '<p>No user data available. Please <a href="https://pritom-360.github.io/Login/Log%20in">login</a> again.</p>';
             }
         });
 
         function logout() {
             localStorage.removeItem('userData');
-            window.location.href = 'https://pritom-360.github.io/Login/Log%20in';
+            window.location.href = 'https://pritom-360.github.io/Login/Log%20in'; // Redirect to login page
         }
     </script>
 </body>
