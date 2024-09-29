@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validation and Password Reset System</title>
+  <style>
+    /* General styling */
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    h2, h3 {
+      text-align: center;
+      color: #333;
+    }
+
+    /* Form container */
+    .form-container {
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      padding: 2rem;
+      max-width: 400px;
+      width: 100%;
+      margin: auto;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #555;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"] {
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Button Styling */
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .timer, .error-message, .success-message {
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .error-message {
+      color: #d9534f;
+    }
+
+    .success-message {
+      color: #5cb85c;
+    }
+
+    .timer {
+      color: #007bff;
+    }
+
+    /* Professional design touches */
+    .form-container h2 {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-container h3 {
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      color: #007bff;
+    }
+
+    .form-container input:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    /* Responsive Design */
+    @media screen and (max-width: 600px) {
+      .form-container {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Account Validation & Password Reset</h2>
+
+    <!-- Form for sending the verification code -->
+    <form id="verifyForm">
+      <h3>Step 1: Verify Your Email</h3>
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      <div id="emailMessage" class="error-message"></div>
+
+      <label for="reg_number">Registration Number:</label>
+      <input type="text" id="reg_number" name="reg_number" required>
+      <div id="regMessage" class="error-message"></div>
+
+      <button type="button" onclick="sendVerificationCode()">Send Verification Code</button>
+
+      <label for="code">Enter Verification Code:</label>
+      <input type="text" id="code" name="code" required>
+      <div id="codeMessage" class="error-message"></div>
+
+      <div id="timeLapse" class="timer"></div> <!-- Time lapse will be displayed here -->
+      <button type="button" onclick="validateVerificationCode()">Validate Code</button>
+    </form>
+
+    <!-- Form for resetting the password -->
+    <form id="resetPasswordForm" style="display: none;">
+      <h3>Step 2: Reset Your Password</h3>
+      <label for="new_password">New Password:</label>
+      <input type="password" id="new_password" name="new_password" required oninput="checkPasswordStrength()">
+      <div id="passwordMessage" class="error-message"></div>
+      <div id="passwordStrength" class="timer"></div> <!-- Password strength displayed here -->
+
+      <button type="button" onclick="resetPassword()">Reset Password</button>
+    </form>
+  </div>
+
+  <script>
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbwzBMjyPX7PMYGHwCmIeh7ZAJil0qg1AqCNScL6_ZZIVYDnfKobNSSKeoEwNY4atQ6D/exec'; // Replace with your deployed GAS URL
+    let countdownInterval; // To hold the interval ID for the countdown timer
+
+    // Store the verification code and timestamp in localStorage
+    function storeVerificationData(code, timestamp) {
+      localStorage.setItem('verificationCode', code);
+      localStorage.setItem('verificationTimestamp', timestamp);
+    }
+
+    // Clear all messages
+    function clearMessages() {
+      document.getElementById('emailMessage').textContent = '';
+      document.getElementById('regMessage').textContent = '';
+      document.getElementById('codeMessage').textContent = '';
+      document.getElementById('passwordMessage').textContent = '';
+      document.getElementById('passwordStrength').textContent = '';
+      document.getElementById('timeLapse').textContent = '';
+      clearInterval(countdownInterval); // Clear any existing timer
+    }
+
+    // Display message below the form element
+    function displayMessage(elementId, message, isError = true) {
+      const element = document.getElementById(elementId);
+      element.textContent = message;
+      element.className = isError ? 'error-message' : 'success-message';
+    }
+
+    // Step 1: Send verification code to the server
+    function sendVerificationCode() {
+      clearMessages();
+      const email = document.getElementById('email').value;
+      const reg_number = document.getElementById('reg_number').value;
+
+      fetch(scriptUrl, {
+        method: 'POST',
+        body: new URLSearchParams({
+          action: 'checkEmailAndRegistration',
+          email: email,
+          reg_number: reg_number
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          displayMessage('emailMessage', 'Email and Registration Number match. Sending code...', false);
+          // Send verification code
+          fetch(scriptUrl, {
+            method: 'POST',
+            body: new URLSearchParams({
+              action: 'sendCode',
+              email: email
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              storeVerificationData(data.code, data.timestamp);
+              displayMessage('codeMessage', 'Verification code sent. Please check your email.', false);
+              startCountdown(2); // Start 2-minute countdown timer
+            } else {
+              displayMessage('codeMessage', 'Error sending verification code.');
+            }
+          });
+        } else {
+          displayMessage('emailMessage', data.message);
+        }
+      });
+    }
+
+    // Start countdown timer (2 minutes)
+    function startCountdown(minutes) {
+      let remainingTime = minutes * 60; // Convert minutes to seconds
+
+      countdownInterval = setInterval(() => {
+        const minutesDisplay = Math.floor(remainingTime / 60);
+        const secondsDisplay = remainingTime % 60;
+        document.getElementById('timeLapse').textContent = `Time left: ${minutesDisplay}m ${secondsDisplay}s`;
+
+        remainingTime--;
+
+        if (remainingTime < 0) {
+          clearInterval(countdownInterval);
+          document.getElementById('timeLapse').textContent = 'Time expired. Please resend the code.';
+        }
+      }, 1000); // Update every second
+    }
+
+    // Step 2: Validate the code entered by the user
+    function validateVerificationCode() {
+      clearMessages();
+      const email = document.getElementById('email').value;
+      const userInputCode = document.getElementById('code').value;
+      const savedCode = localStorage.getItem('verificationCode');
+      const savedTimestamp = localStorage.getItem('verificationTimestamp');
+      const currentTime = new Date().getTime();
+
+      if (savedCode && savedTimestamp && currentTime - savedTimestamp <= 2 * 60 * 1000) { // 2 minutes limit
+        if (savedCode === userInputCode) {
+          displayMessage('codeMessage', 'Code validated successfully!', false);
+          // Call the server to confirm validation
+          fetch(scriptUrl, {
+            method: 'POST',
+            body: new URLSearchParams({
+              action: 'validateCode',
+              email: email,
+              code: userInputCode
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              displayMessage('codeMessage', 'Code validated. Please proceed to reset your password.', false);
+              document.getElementById('resetPasswordForm').style.display = 'block';
+            } else {
+              displayMessage('codeMessage', 'Invalid code.');
+            }
+          });
+        } else {
+          displayMessage('codeMessage', 'Incorrect code.');
+        }
+      } else {
+        displayMessage('codeMessage', 'Verification code expired. Please resend the code.');
+      }
+    }
+
+    // Step 3: Reset password functionality
+    function resetPassword() {
+      const newPassword = document.getElementById('new_password').value;
+      const email = document.getElementById('email').value;
+
+      if (isStrongPassword(newPassword)) {
+        fetch(scriptUrl, {
+          method: 'POST',
+          body: new URLSearchParams({
+            action: 'resetPassword',
+            email: email,
+            new_password: newPassword
+          })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            displayMessage('passwordMessage', 'Password reset successfully!', false);
+          } else {
+            displayMessage('passwordMessage', 'Error resetting password.');
+          }
+        });
+      } else {
+        displayMessage('passwordMessage', 'Password is not strong enough.');
+      }
+    }
+
+    // Password strength validation function
+    function isStrongPassword(password) {
+      const minLength = 8;
+      const hasUpperCase = /[A-Z]/.test(password);
+      const hasLowerCase = /[a-z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+      if (password.length >= minLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar) {
+        document.getElementById('passwordStrength').textContent = 'Strong password.';
+        return true;
+      } else {
+        document.getElementById('passwordStrength').textContent = 'Password must be at least 8 characters long and include uppercase, lowercase, a number, and a special character.';
+        return false;
+      }
+    }
+
+    // Check password strength as the user types
+    function checkPasswordStrength() {
+      const password = document.getElementById('new_password').value;
+      isStrongPassword(password);
+    }
+  </script>
+</body>
+</html>
